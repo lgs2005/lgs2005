@@ -1,5 +1,3 @@
-
-from posixpath import split
 import re
 
 def multi_char_replace(input: str, replace: dict[str, str]) -> str:
@@ -51,14 +49,16 @@ fita = "AAAATTGTTT TAAAGGAATA CCATGCCTCC CAAGAAGAAG GATGAGAAGT CACAACCGCC CCGCAC
 fita = fita.replace(" ", "")
 
 gene = encontrar_gene(fita)
+inicio = fita.index(gene)
+fim = inicio + len(gene)
 
-print(f"\nA) Gene:   ({len(gene)} bases)")
+print(f"\nA) Gene:  (inicio: {inicio}, fim: {fim}, bases: {len(gene)})")
 print(' '.join(split_em_trincas(gene)))
 
 fita_complementar = multi_char_replace(fita, tabela_complementar)
 
 print("\nB) Fita complementar:")
-print("'5", fita_complementar, "'3")
+print("'5", fita_complementar, "3'")
 
 gene_complementar = multi_char_replace(gene, tabela_complementar)
 mensageiro = multi_char_replace(gene_complementar, tabela_transcricao)
@@ -72,6 +72,7 @@ nanticodons = len(anticodons) / 3
 
 print(f"\nD) Anticódons: ({nanticodons} códons)")
 print(' '.join(split_em_trincas(anticodons)))
+print("ATENÇÃO: O último não conta, é o códon de parada.")
 
 tabela_aminoacidos = {
     'Phe': ["UUU", "UUC"],
