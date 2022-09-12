@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+        integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+
+    <style>
+        #lista-empresas td,
+        #lista-empresas th {
+            border-right: 2px solid black;
+            padding: 5px 10px;
+        }
+
+        #lista-empresas tr:nth-child(odd) {
+            background-color: rgb(206, 206, 206);
+        }
+
+        #lista-empresas tr:nth-child(even) {
+            background-color: rgb(146, 140, 140);
+        }
+    </style>
+</head>
+
+<label for="input-limite">Limite</label>
+<input type="number" value="10" min="0" max="100" id="input-limite">
+
+<label for="input-offset">Offset</label>
+<input type="number" value="0" min="0" id="input-offset">
+
+<table id='lista-empresas'>
+    <tr>
+        <th>Ano</th>
+        <th>Domínio</th>
+        <th>Empregados (atual)</th>
+        <th>Empregados (total)</th>
+        <th>ID</th>
+        <th>Indústria</th>
+        <th>LinkedIn</th>
+        <th>Localização</th>
+        <th>Nome</th>
+        <th>País</th>
+        <th>Tamanho</th>
+    </tr>
+</table>
+
+<body>
+
+
+    <script>
+        function atualizarLista() {
+            let limit = $('#input-limite').val()
+            let offset = $('#input-offset').val()
+
+
+            $.ajax({
+                url: `http://localhost:5000/listar_empresas?limit=${limit}&offset=${offset}`,
+                method: 'GET',
+
+                success: (empresas) => {
+                    $('.item-lista').remove();
+
+                    for (let emp of empresas) {
+                        let html = [];
+                        html.push('<tr class="item-lista">');
+
+                        for (let [_, valor] of Object.entries(emp)) {
+                            html.push('<td>' + valor + '</td>');
+                        }
+
+                        html.push('</tr>');
+                        $('#lista-empresas').append(html.join('\n'));
+                    }
+                },
+
+                error: () => {
+                    alert('Ocorreu um erro.')
+                },
+            })
+        }
+
+        $(function () {
+
+            $('#input-limite').on('input', () => atualizarLista())
+            $('#input-offset').on('input', () => atualizarLista())
+            atualizarLista();
+
+        });
+    </script>
+</body>
+
+</html>
