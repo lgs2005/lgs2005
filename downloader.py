@@ -113,7 +113,8 @@ def main():
 
     if device == 'pp':
         print(f'[downloader.py]: Running termux media rescan')
-        os.system('termux-media-scan -r /storage/emulated/0/Music')
+        os.system(f'termux-media-scan -r {download_path}')
+        os.system(f'termux-media-scan {download_path}.m3u')
 
     # Your subscription cannot stop me
     # I WILL play whatever song i want on repeat all day
