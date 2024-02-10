@@ -102,22 +102,23 @@ def main():
 
     print('[downloader.py]: Generating m3u file')
     
+    file_list = os.listdir(download_path)
+    file_list.sort()
+
     file = open(download_path + '.m3u', 'w', encoding='utf-8')
     file.write("#EXTM3U\n")
 
-    for songname in os.listdir(download_path):
-        print(f'[downloader.py]: m3u entry: {songname}')
-        file.write(f"{foldername}/{songname}\n")
+    for name in file_list:
+        print(f'[downloader.py]: m3u entry: {name}')
+        file.write(f"{foldername}/{name}\n")
 
     file.close()
 
     if device == 'pp':
+        # }Uhmmm this doent work Xdd
         print(f'[downloader.py]: Running termux media rescan')
         os.system(f'termux-media-scan -r {download_path}')
         os.system(f'termux-media-scan {download_path}.m3u')
-
-    # Your subscription cannot stop me
-    # I WILL play whatever song i want on repeat all day
 
 if __name__ == '__main__':
     main()
