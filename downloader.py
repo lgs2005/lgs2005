@@ -19,11 +19,11 @@ def main():
     
     [_, url, foldername, device, template] = sys.argv
     
-    if not device in ['pc', 'pp']:
+    if not device in ['pc', 'mb']:
         log('Unknown device.')
         return
     
-    if not template in ['order', 'free', 'ordersplit', 'freesplit']:
+    if not template in ['list', 'split']:
         log('Unknown template.')
         return
     
@@ -31,7 +31,7 @@ def main():
     
     if device == 'pc':
         download_path = f'./{foldername}'
-    elif device == 'pp':
+    elif device == 'mb':
         download_path = f'/storage/emulated/0/Music/{foldername}'
 
     if download_path == None:
@@ -40,20 +40,11 @@ def main():
 
     output_template = None
 
-    if template == 'order':
-        output_template = {
-            'default': f'{download_path}/%(playlist_index)s - %(title)s.%(ext)s'
-        }
-    elif template == 'free':
+    if template == 'list':
         output_template = {
             'default': f'{download_path}/%(title)s.%(ext)s'
         }
-    elif template == 'ordersplit':
-        output_template = {
-            'default': temp_template,
-            'chapter': f'{download_path}/%(section_number)02d - %(section_title)s.%(ext)s'
-        }
-    elif template == 'freesplit':
+    elif template == 'split':
         output_template = {
             'default': temp_template,
             'chapter': f'{download_path}/%(section_title)s.%(ext)s'
@@ -70,7 +61,7 @@ def main():
     log(f'Confirm?')
     input()
     
-    if device == 'pp':
+    if device == 'mb':
         os.system('termux-wake-lock')
 
     postprocessors = [
@@ -87,7 +78,7 @@ def main():
         }
     ]
 
-    if template in ['ordersplit', 'freesplit']:
+    if template in ['split']:
         postprocessors.append({
             'key': 'FFmpegSplitChapters',
             'force_keyframes': False,
@@ -133,7 +124,7 @@ def main():
     file.close()
     log('Done')
 
-    if device == 'pp':
+    if device == 'mb':
         # }Uhmmm this doent work Xdd
         # Haha well         i uhm ,,,,,,,,,,,,,,, Wrong.
         log(f'Running termux media rescan')
