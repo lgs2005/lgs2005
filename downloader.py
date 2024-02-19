@@ -2,25 +2,29 @@ import yt_dlp
 import shutil
 import sys
 import os
+import pathlib
 
-help_str = '[downloader.py]: Usage: python downloader.py <url> <foldername> <device> <template>'
+help_str = 'Usage: python downloader.py <url> <foldername> <device> <template>'
 temp_folder = './_downloader_temp'
 temp_template = f'{temp_folder}/%(title)s.%(ext)s'
 
+def log(message: str):
+    print(f'[downloader.py]: {message}')
+
 def main():
     if len(sys.argv) != 5:
-        print('[downloader.py]: Wrong argument count.')
-        print(help_str)
+        log('Wrong argument count.')
+        log(help_str)
         return
     
     [_, url, foldername, device, template] = sys.argv
     
     if not device in ['pc', 'pp']:
-        print('[downloader.py]: Unknown device.')
+        log('Unknown device.')
         return
     
     if not template in ['order', 'free', 'ordersplit', 'freesplit']:
-        print('[downloader.py]: Unknown template.')
+        log('Unknown template.')
         return
     
     download_path = None
@@ -31,7 +35,7 @@ def main():
         download_path = f'/storage/emulated/0/Music/{foldername}'
 
     if download_path == None:
-        print('[downloader.py]: Couldn\'t resolve download path.')
+        log('Couldn\'t resolve download path.')
         return
 
     output_template = None
@@ -56,12 +60,19 @@ def main():
         }
     
     if output_template == None:
-        print('[downloader.py]: Couldn\'t resolve template.')
+        log('Couldn\'t resolve template.')
         return
     
-    print(f'[downloader.py]: Will download to {output_template}.')
-    input('[downloader.py]: Confirm?')
+    log(f'Will download to {output_template}.')
+    # FUCKIGN,.                                        FIRNANTUBTG
+    # input('[downloader.py]: Confirm?')
+    # Bmv thanmks for the idea
+    log(f'Confirm?')
+    input()
     
+    if device == 'pp':
+        os.system('termux-wake-lock')
+
     postprocessors = [
         {
             'key': 'FFmpegExtractAudio',
@@ -82,6 +93,16 @@ def main():
             'force_keyframes': False,
         })
 
+    file_list = []
+
+    def push_file_name_hook(info):
+        nonlocal file_list
+
+        if info.get('status') == 'finished':
+            path = pathlib.Path(info.get('filename'))
+            final_path = path.with_suffix('.mp3')
+            file_list.append(str(final_path))
+
     with yt_dlp.YoutubeDL({
         'extract_flat': 'discard_in_playlist',
         'final_ext': 'mp3',
@@ -93,32 +114,39 @@ def main():
         'postprocessors': postprocessors,
         'retries': 10,
         'retry_sleep_functions': { 'http': lambda: 1 },
+        'progress_hooks': [push_file_name_hook]
     }) as downloader:
         downloader.download(url)
 
     if os.path.exists(temp_folder):
-        print('[downloader.py]: Deleting temp folder')
+        log('Deleting temp folder')
         shutil.rmtree(temp_folder)
 
-    print('[downloader.py]: Generating m3u file')
+    log('Generating m3u file')
     
-    file_list = os.listdir(download_path)
-    file_list.sort()
-
     file = open(download_path + '.m3u', 'w', encoding='utf-8')
     file.write("#EXTM3U\n")
 
     for name in file_list:
-        print(f'[downloader.py]: m3u entry: {name}')
-        file.write(f"{foldername}/{name}\n")
+        file.write(f"{name}\n")
 
     file.close()
+    log('Done')
 
     if device == 'pp':
         # }Uhmmm this doent work Xdd
-        print(f'[downloader.py]: Running termux media rescan')
+        # Haha well         i uhm ,,,,,,,,,,,,,,, Wrong.
+        log(f'Running termux media rescan')
         os.system(f'termux-media-scan -r {download_path}')
         os.system(f'termux-media-scan {download_path}.m3u')
+        os.system('termux-wake-unlock')
+        os.system(f'termux-notification --content "Download Complete: {foldername}"')
 
 if __name__ == '__main__':
-    main()
+    if os.path.exists('./underscores - wallsocket'):
+        shutil.rmtree('./underscores - wallsocket')
+
+    try:
+        main()
+    except KeyboardInterrupt:
+        log('Interrupted.') # Newline fans?
