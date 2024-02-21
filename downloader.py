@@ -128,8 +128,8 @@ def main():
         # }Uhmmm this doent work Xdd
         # Haha well         i uhm ,,,,,,,,,,,,,,, Wrong.
         log(f'Running termux media rescan')
-        os.system(f'termux-media-scan -r {download_path}')
-        os.system(f'termux-media-scan {download_path}.m3u')
+        os.system(f'termux-media-scan -r "{download_path}"')
+        os.system(f'termux-media-scan "{download_path}.m3u"')
         os.system('termux-wake-unlock')
         os.system(f'termux-notification --content "Download Complete: {foldername}"')
 
