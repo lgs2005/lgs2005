@@ -126,7 +126,7 @@ def main():
 
     if device == 'mb':
         # }Uhmmm this doent work Xdd
-        # Haha well         i uhm ,,,,,,,,,,,,,,, Wrong.
+        # Haha well         i uhm ,,,,,,,,,,,,,,, Wrong. (NOT! DUMBASS
         log(f'Running termux media rescan')
         os.system(f'termux-media-scan -r "{download_path}"')
         os.system(f'termux-media-scan "{download_path}.m3u"')
