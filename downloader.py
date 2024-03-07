@@ -85,7 +85,7 @@ def main(args):
 
     file_list = []
 
-    def debug_hook(info):
+    def file_list_hook(info):
         # making sure befcuase GOF DUFKCING KNOWS what this fuckin lnguage
         # scoping rules are like holysh it PYthon WHY CNAYT YOU BE NORMAL
         nonlocal file_list
@@ -111,7 +111,7 @@ def main(args):
         'postprocessors': postprocessors,
         'retries': 10,
         'retry_sleep_functions': { 'http': lambda: 1 },
-        'postprocessor_hooks': [debug_hook]
+        'postprocessor_hooks': [file_list_hook]
     }) as downloader:
         downloader.download(url)
 
