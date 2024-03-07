@@ -2,7 +2,6 @@ import yt_dlp
 import shutil
 import sys
 import os
-import pathlib
 
 help_str = 'Usage: python downloader.py <url> <foldername> <device> <template>'
 temp_folder = './_downloader_temp'
@@ -11,13 +10,13 @@ temp_template = f'{temp_folder}/%(title)s.%(ext)s'
 def log(message: str):
     print(f'[downloader.py]: {message}')
 
-def main():
-    if len(sys.argv) != 5:
+def main(args):
+    if len(args) != 5:
         log('Wrong argument count.')
         log(help_str)
         return
     
-    [_, url, foldername, device, template] = sys.argv
+    [_, url, foldername, device, template] = args
     
     if not device in ['pc', 'mb']:
         log('Unknown device.')
@@ -78,7 +77,7 @@ def main():
         }
     ]
 
-    if template in ['split']:
+    if template == 'split':
         postprocessors.append({
             'key': 'FFmpegSplitChapters',
             'force_keyframes': False,
@@ -86,13 +85,20 @@ def main():
 
     file_list = []
 
-    def push_file_name_hook(info):
+    def debug_hook(info):
+        # making sure befcuase GOF DUFKCING KNOWS what this fuckin lnguage
+        # scoping rules are like holysh it PYthon WHY CNAYT YOU BE NORMAL
         nonlocal file_list
 
-        if info.get('status') == 'finished':
-            path = pathlib.Path(info.get('filename'))
-            final_path = path.with_suffix('.mp3')
-            file_list.append(str(final_path))
+        if (template == 'list'):
+            if (info.get('postprocessor') == 'MoveFiles' and info.get('status') == 'finished'):
+                file_list.append(info.get('info_dict').get('filepath'))
+        elif (template == 'split'):
+            if (info.get('postprocessor') == 'SplitChapters' and info.get('status') == 'finished'):
+                # How i miss javascript
+                chapter_list = info.get('info_dict').get('chapters')
+                chapter_files = map(lambda v: v.get('filepath'), chapter_list)
+                file_list.extend(chapter_files)
 
     with yt_dlp.YoutubeDL({
         'extract_flat': 'discard_in_playlist',
@@ -105,7 +111,7 @@ def main():
         'postprocessors': postprocessors,
         'retries': 10,
         'retry_sleep_functions': { 'http': lambda: 1 },
-        'progress_hooks': [push_file_name_hook]
+        'postprocessor_hooks': [debug_hook]
     }) as downloader:
         downloader.download(url)
 
@@ -127,6 +133,7 @@ def main():
     if device == 'mb':
         # }Uhmmm this doent work Xdd
         # Haha well         i uhm ,,,,,,,,,,,,,,, Wrong. (NOT! DUMBASS
+        # It work now :?
         log(f'Running termux media rescan')
         os.system(f'termux-media-scan -r "{download_path}"')
         os.system(f'termux-media-scan "{download_path}.m3u"')
@@ -134,10 +141,7 @@ def main():
         os.system(f'termux-notification --content "Download Complete: {foldername}"')
 
 if __name__ == '__main__':
-    if os.path.exists('./underscores - wallsocket'):
-        shutil.rmtree('./underscores - wallsocket')
-
     try:
-        main()
+        main(sys.argv)
     except KeyboardInterrupt:
         log('Interrupted.') # Newline fans?
