@@ -90,11 +90,11 @@ def main(args):
         # scoping rules are like holysh it PYthon WHY CNAYT YOU BE NORMAL
         nonlocal file_list
 
-        if (template == 'list'):
-            if (info.get('postprocessor') == 'MoveFiles' and info.get('status') == 'finished'):
+        if template == 'list':
+            if info.get('postprocessor') == 'MoveFiles' and info.get('status') == 'finished':
                 file_list.append(info.get('info_dict').get('filepath'))
-        elif (template == 'split'):
-            if (info.get('postprocessor') == 'SplitChapters' and info.get('status') == 'finished'):
+        elif template == 'split':
+            if info.get('postprocessor') == 'SplitChapters' and info.get('status') == 'finished':
                 # How i miss javascript
                 chapter_list = info.get('info_dict').get('chapters')
                 chapter_files = map(lambda v: v.get('filepath'), chapter_list)
