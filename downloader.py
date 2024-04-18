@@ -121,13 +121,28 @@ def main(args):
 
     log('Generating m3u file')
     
-    file = open(download_path + '.m3u', 'w', encoding='utf-8')
-    file.write("#EXTM3U\n")
+    m3u_path = f'{download_path}.m3u'
+    entries = []
 
+    try:
+        with open(m3u_path, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+            lines.pop(0)
+            entries.extend(lines)
+    except FileNotFoundError:
+        pass
+    
     for name in file_list:
-        file.write(f"{name}\n")
+        path = f'{name}\n'
+        
+        if path not in entries:
+            entries.append(path)
+    
+    # You kno  whyam i using Python when i could just,. ,,, InstallnoodOOH right i need otyuubedl
+    
+    with open(m3u_path, 'w', encoding='utf-8') as file:
+        file.write(f"#EXTM3U\n{''.join(entries)}")
 
-    file.close()
     log('Done')
 
     if device == 'mb':
